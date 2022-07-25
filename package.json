@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/qinran0423/ts-do-exercise#readme",
   "dependencies": {
-    "@type-challenges/utils": "^0.1.1",
-    "tsd": "^0.19.1"
+    "@type-challenges/utils": "^0.1.1"
   }
 }

@@ -19,3 +19,14 @@ function readonly(obj) {
   }
   return result
 }
+
+
+// 知识点
+// mapped 
+// - https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#handbook-content
+// keyof -> lookup  
+// - https://www.typescriptlang.org/docs/handbook/2/keyof-types.html#the-keyof-type-operator
+//  indexed
+// - https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html#handbook-content
+// readonly
+// - https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html#readonly-and-const

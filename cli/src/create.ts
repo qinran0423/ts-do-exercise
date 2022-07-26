@@ -1,7 +1,8 @@
 import * as inquirer from "inquirer"
 import { resolve } from "path"
 import { ensureDirSync, ensureFileSync } from "fs-extra"
-import { lightBlue } from "kolorist"
+import { lightBlue, red } from "kolorist"
+import { readdirSync } from "node:fs"
 
 export async function onCreate(args) {
   let { name } = args
@@ -12,6 +13,18 @@ export async function onCreate(args) {
         name: "name",
         type: "input",
         message: "(必填) 请输入题目名称"
+      }
+    ])
+    name = result.name
+  }
+
+  const dirs = await readdirSync("../type-challenges")
+  if (dirs.includes(name)) {
+    const result = await inquirer.prompt([
+      {
+        name: "name",
+        type: "input",
+        message: red(`×题目${name}已经被创建， 请重新输入`)
       }
     ])
     name = result.name

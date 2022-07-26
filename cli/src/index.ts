@@ -1,6 +1,7 @@
 
 
 import {Command} from 'commander'
+import { onCreate } from './create'
 
 // 创建命令对象
 const program = new Command()
@@ -9,10 +10,8 @@ const program = new Command()
 program
     .command('create')
     .description('创建一个type-challenges题目')
-    .option('-t --type <type>', '创建题目名称')
-    .action((cmd) => {
-      console.log(cmd);
-    })
+    .option('-n --name <name>', '创建题目名称')
+    .action(onCreate)
 
 // 执行命令行参数解析
 program.parse()

@@ -1,10 +1,22 @@
 import * as inquirer from "inquirer"
-import { resolve } from "path"
-import { ensureDirSync, ensureFileSync } from "fs-extra"
-import { lightBlue, red } from "kolorist"
+import { ensureDirSync, writeFileSync } from "fs-extra"
+import { lightBlue, lightGray, red } from "kolorist"
 import { readdirSync } from "node:fs"
+import { resolve } from "path"
+import { Octokit } from "@octokit/core"
+import { WriteFileOptions } from "fs"
 
-export async function onCreate(args) {
+const WRITE_FILE_OPTIONS: WriteFileOptions = { encoding: "utf-8" }
+
+const octokit = new Octokit({
+  auth: "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"
+})
+
+interface obj {
+  name: string
+}
+
+export async function onCreate(args: obj = { name: "" }) {
   let { name } = args
 
   if (!name) {
@@ -19,7 +31,13 @@ export async function onCreate(args) {
   }
 
   const dirs = await readdirSync("../type-challenges")
-  if (dirs.includes(name)) {
+  // 先看看有没有重复创建的
+  const hasCreate = dirs.findIndex((item) => {
+    const names = item.split("-")
+    return names[0] == name
+  })
+
+  if (hasCreate > -1) {
     const result = await inquirer.prompt([
       {
         name: "name",
@@ -30,19 +48,68 @@ export async function onCreate(args) {
     name = result.name
   }
 
-  createComponent(name)
+  createDir(name)
 }
 
-function createComponent(name) {
-  const tmplDir = resolve("../type-challenges", name)
-  ensureDirSync(tmplDir)
+async function createDir(name: string) {
+  try {
+    const res = await octokit.request(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      {
+        owner: "type-challenges",
+        repo: "type-challenges",
+        path: `questions`
+      }
+    )
+    if (res.data) {
+      let filearr = res.data as any[]
 
-  ensureFileSync(resolve(tmplDir, "template.ts"))
-  ensureFileSync(resolve(tmplDir, "test-cases.ts"))
+      const isFindFileContent = filearr.find((item) => {
+        const names = item.name.split("-")
+        return names[0] === name
+      })
+      // 如果isFindFileContent,那就去创建文件夹 和内容
+      if (isFindFileContent) {
+        name = isFindFileContent.name
+        const tmplDir = resolve("../type-challenges", name)
+        ensureDirSync(tmplDir)
 
-  console.log(
-    lightBlue(`
-      ✔️ 题目文件${name}目录创建成功,请添加题目内容
-    `)
+        createTmpl(tmplDir, name, "template")
+        createTmpl(tmplDir, name, "test-cases")
+
+        console.log(
+          lightBlue(`
+            ✔️ 题目${name}创建成功
+          `)
+        )
+      } else {
+        // 不存在则可能没找到  重新创建
+        aFreshCreate(name)
+      }
+    }
+  } catch (error) {
+    aFreshCreate(name)
+  }
+}
+
+async function createTmpl(tmplDir: string, name: string, file: string) {
+  const res = await octokit.request(
+    "GET /repos/{owner}/{repo}/contents/{path}",
+    {
+      headers: {
+        accept: "application/vnd.github.raw"
+      },
+      owner: "type-challenges",
+      repo: "type-challenges",
+      path: `questions/${name}/${file}.ts`
+    }
   )
+
+  const tmplFilePath = resolve(tmplDir, `${file}.ts`)
+  writeFileSync(tmplFilePath, res.data, WRITE_FILE_OPTIONS)
+}
+
+function aFreshCreate(name) {
+  console.log(red(`题目${name}可能没有找到`))
+  return onCreate()
 }

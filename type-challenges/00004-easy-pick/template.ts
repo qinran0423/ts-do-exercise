@@ -1,16 +1,15 @@
-
 type MyPick<T, K extends keyof T> = {
   [P in K]: T[P]
 }
 
 function myPick(todo, keys) {
-  const obj = {}
+  let obj = {}
 
-  keys.forEach(key => {
-    if (key in obj) {
-      obj[key] = todo[key]
+  keys.forEach((key) => {
+    if (key in todo) {
+      obj[key] = keys[key]
     }
-  });
+  })
 
   return obj
 }

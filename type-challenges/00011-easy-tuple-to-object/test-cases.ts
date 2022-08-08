@@ -4,6 +4,8 @@ const tuple = ["tesla", "model 3", "model X", "model Y"] as const
 const tupleNumber = [1, 2, 3, 4] as const
 const tupleMix = [1, "2", 3, "4"] as const
 
+type r = typeof tuple
+
 type cases = [
   Expect<
     Equal<
@@ -24,3 +26,7 @@ type cases = [
 
 // @ts-expect-error
 type error = TupleToObject<[[1, 2], {}]>
+
+// 1. typeof 将 js 转换成类型世界
+let str = "1234"
+type s = typeof str

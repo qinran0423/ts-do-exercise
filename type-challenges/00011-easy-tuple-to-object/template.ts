@@ -2,11 +2,14 @@ type TupleToObject<T extends readonly (string | number | symbol)[]> = {
   [P in T[number]]: P
 }
 
-function TupleToObject(arr) {
+function tupleToObject(array) {
   const obj = {}
-  arr.forEach((val) => {
+
+  array.forEach((val) => {
     obj[val] = val
   })
 
   return obj
 }
+
+// 遍历数组 T[number]

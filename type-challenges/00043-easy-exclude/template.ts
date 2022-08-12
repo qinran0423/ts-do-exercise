@@ -1,4 +1,4 @@
-type MyExclude<T, U> = T extends U ? never : T
+export type MyExclude<T, U> = T extends U ? never : T
 
 type t2 = "a" | "b" | "c"
 type t1 = "a"
